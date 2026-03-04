@@ -27,29 +27,12 @@ jobs:
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-environment
 
-      - name: Determine Match Spec
-        id: determine-spec
-        run: |
-          echo "Event name: $GITHUB_EVENT_NAME"
-          echo "\"${{ github.event.inputs.match_spec }}\""
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            # 手动触发
-            SPEC="${{ github.event.inputs.match_spec }}"
-          else
-            # push tag
-            # Tag 格式： matching-<spec>
-            REF="${GITHUB_REF#refs/tags/}"
-            SPEC="${REF#matching-}"
-          fi
-          echo "Match Spec: $SPEC"
-          echo "MATCH_SPEC=$SPEC" >> $GITHUB_OUTPUT
 
-      - name: Build Matching Firmwares
+      - name: Build Firmwares
         env:
-          MATCH_SPEC: ${{ steps.determine-spec.outputs.MATCH_SPEC }}
-        run: |
-          echo "Building all firmwares matching: $MATCH_SPEC"
-          sh build.sh build-matching-firmwares "$MATCH_SPEC"
+          FIRMWARE_VERSION: ${{ env.GIT_TAG_VERSION }}
+        run: /usr/bin/env bash build.sh build-matching-firmwares "${{ github.event.inputs.match_spec }}"
+
 
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v4
