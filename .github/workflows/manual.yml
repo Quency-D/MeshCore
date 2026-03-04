@@ -31,6 +31,7 @@ jobs:
         id: determine-spec
         run: |
           echo "Event name: $GITHUB_EVENT_NAME"
+          echo "${{ github.event.inputs.match_spec }}"
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             # 手动触发
             SPEC="${{ github.event.inputs.match_spec }}"
