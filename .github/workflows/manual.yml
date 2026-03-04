@@ -10,8 +10,8 @@ on:
         description: "Input the matching string (e.g. heltec_v4)"
         required: true
         default: "heltec_v4"
-      version:
-        description: "Enter the version number (e.g. v1.13.0)"
+      firmware_version:
+        description: "Input the version number (e.g. v1.13.0)"
         required: true
         default: "v1.13.0"
   push:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Build Firmwares
         env:
-          FIRMWARE_VERSION: ${{ env.GIT_TAG_VERSION }}
+          FIRMWARE_VERSION: "${{ github.event.inputs.firmware_version }}"
         run: /usr/bin/env bash build.sh build-matching-firmwares "${{ github.event.inputs.match_spec }}"
 
 
