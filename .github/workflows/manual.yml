@@ -14,10 +14,6 @@ on:
         description: "Input the version number (e.g. v1.13.0)"
         required: true
         default: "v1.13.0"
-  push:
-    tags:
-      - "matching-*"
-  pull_request:
 
 jobs:
   build:
