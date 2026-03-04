@@ -1,0 +1,65 @@
+name: Build Matching Firmwares
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      match_spec:
+        description: "输入匹配字符串 (如 RAK_4631)"
+        required: true
+        default: "RAK_4631"
+  push:
+    tags:
+      - "matching-*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Clone Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build-environment
+
+      - name: Determine Match Spec
+        id: determine-spec
+        run: |
+          echo "Event name: $GITHUB_EVENT_NAME"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            # 手动触发
+            SPEC="${{ github.event.inputs.match_spec }}"
+          else
+            # push tag
+            # Tag 格式： matching-<spec>
+            REF="${GITHUB_REF#refs/tags/}"
+            SPEC="${REF#matching-}"
+          fi
+          echo "Match Spec: $SPEC"
+          echo "MATCH_SPEC=$SPEC" >> $GITHUB_OUTPUT
+
+      - name: Build Matching Firmwares
+        env:
+          MATCH_SPEC: ${{ steps.determine-spec.outputs.MATCH_SPEC }}
+        run: |
+          echo "Building all firmwares matching: $MATCH_SPEC"
+          sh build.sh build-matching-firmwares "$MATCH_SPEC"
+
+      - name: Upload Workflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: matching-firmwares
+          path: out
+
+      - name: Create Release (Tag Trigger Only)
+        if: startsWith(github.ref, 'refs/tags/matching-')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Matching Firmwares: ${{ steps.determine-spec.outputs.MATCH_SPEC }}"
+          body: "Built all firmwares matching ${{ steps.determine-spec.outputs.MATCH_SPEC }}"
+          draft: true
+          files: out/*
