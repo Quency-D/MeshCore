@@ -39,12 +39,3 @@ jobs:
         with:
           name: matching-firmwares
           path: out
-
-      - name: Create Release (Tag Trigger Only)
-        if: startsWith(github.ref, 'refs/tags/matching-')
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "Matching Firmwares: ${{ steps.determine-spec.outputs.MATCH_SPEC }}"
-          body: "Built all firmwares matching ${{ steps.determine-spec.outputs.MATCH_SPEC }}"
-          draft: true
-          files: out/*
