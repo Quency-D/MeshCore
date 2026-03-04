@@ -7,9 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       match_spec:
-        description: "输入匹配字符串 (如 RAK_4631)"
+        description: "Input the matching string (e.g. heltec_v4)"
         required: true
-        default: "RAK_4631"
+        default: "heltec_v4"
+      version:
+        description: "Enter the version number (e.g. v1.13.0)"
+        required: true
+        default: "v1.13.0"
   push:
     tags:
       - "matching-*"
