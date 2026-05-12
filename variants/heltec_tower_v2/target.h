@@ -4,6 +4,7 @@
 #include <RadioLib.h>
 #include <HeltecTowerV2Board.h>
 #include <helpers/AutoDiscoverRTCClock.h>
+#include <helpers/ExternalWatchdogManager.h>
 #include <helpers/radiolib/CustomSX1262Wrapper.h>
 #include <helpers/radiolib/RadioLibWrappers.h>
 #include <helpers/sensors/EnvironmentSensorManager.h>
@@ -14,10 +15,20 @@
 #include "helpers/ui/NullDisplayDriver.h"
 #endif
 
+class HeltecTowerV2ExternalWatchdog : public ExternalWatchdogManager {
+public:
+  HeltecTowerV2ExternalWatchdog() {}
+  bool begin() override;
+  void loop() override;
+  unsigned long getIntervalMs() const override;
+  void feed() override;
+};
+
 extern HeltecTowerV2Board board;
 extern WRAPPER_CLASS radio_driver;
 extern AutoDiscoverRTCClock rtc_clock;
 extern EnvironmentSensorManager sensors;
+extern HeltecTowerV2ExternalWatchdog external_watchdog;
 
 #ifdef DISPLAY_CLASS
 extern DISPLAY_CLASS display;
